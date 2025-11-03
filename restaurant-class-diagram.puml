@@ -1,0 +1,194 @@
+@startuml
+title Syst?me de gestion de restaurant - Diagramme de classes
+
+hide empty methods
+
+skinparam classAttributeIconSize 0
+skinparam classFontSize 12
+skinparam classAttributeFontSize 11
+skinparam classBackgroundColor #FDF8F5
+skinparam classBorderColor #4B3F72
+skinparam shadowing false
+
+class Client {
+  -idClient : int
+  -nom : string
+  -prenom : string
+  -adresse : string
+  -email : string
+  -telephone : string
+  -balance : decimal
+  +creerPanier()
+  +passerCommande()
+}
+
+class Panier {
+  -idPanier : int
+  -dateCreation : Date
+  +ajouterPlat(plat : Plat, quantite : int)
+  +vider()
+}
+
+class Commande {
+  -idCommande : int
+  -dateCommande : DateTime
+  -etat : CommandeEtat
+  +confirmer()
+  +marquerLivree()
+}
+
+class LigneCommande {
+  -idLigne : int
+  -quantite : int
+  -prixUnitaire : decimal
+  +montantLigne() : decimal
+}
+
+class Plat {
+  -idPlat : int
+  -nom : string
+  -prix : decimal
+  -description : string
+  +estDisponible() : bool
+}
+
+class CategoriePlat {
+  -idCategorie : int
+  -nom : string
+}
+
+class Menu {
+  -idMenu : int
+  -nom : string
+  -description : string
+  -prix : decimal
+  +calculerPrix() : decimal
+}
+
+class Paiement {
+  -idPaiement : int
+  -datePaiement : DateTime
+  -montant : decimal
+  -methode : MethodePaiement
+  +valider()
+}
+
+class Livraison {
+  -idLivraison : int
+  -dateLivraison : DateTime
+  -adresseDestination : string
+  +planifier()
+}
+
+class Produit {
+  -idProduit : int
+  -nom : string
+  -prixUnitaire : decimal
+  -seuil : int
+  +estSousSeuil() : bool
+}
+
+class Stock {
+  -idStock : int
+  -quantite : int
+  +ajuster(delta : int)
+}
+
+class Fournisseur {
+  -idFournisseur : int
+  -nom : string
+  -contact : string
+  +passerCommandeInterne(cmd : CommandeInterne)
+}
+
+class CommandeInterne {
+  -idCmdInt : int
+  -dateCommande : Date
+  -etat : CommandeInterneEtat
+  +validerReception()
+}
+
+class LigneCommandeInterne {
+  -idLigneInt : int
+  -quantite : int
+}
+
+abstract class Personnel {
+  -idPersonnel : int
+  -nom : string
+  -prenom : string
+  -fonction : string
+  +login()
+}
+
+class Serveur {
+  +prendreCommande(c : Commande)
+}
+
+class Chef {
+  +preparerCommande(c : Commande)
+}
+
+class Livreur {
+  +effectuerLivraison(l : Livraison)
+}
+
+class Administrateur {
+  +gererCatalogue()
+}
+
+enum CommandeEtat {
+  brouillon
+  en_preparation
+  en_livraison
+  livree
+  annulee
+}
+
+enum CommandeInterneEtat {
+  brouillon
+  validee
+  recue
+  annulee
+}
+
+enum MethodePaiement {
+  carte_bancaire
+  cheque
+  especes
+  virement
+}
+
+Client "1" -- "1" Panier : possede
+Client "1" -- "0..*" Commande : passe
+
+Panier "1" *-- "0..*" LigneCommande : contient
+Commande "1" *-- "1..*" LigneCommande : contient
+
+LigneCommande "*" -- "1" Plat : reference
+Plat "*" -- "1" CategoriePlat : appartient
+Menu "1" o-- "1..*" Plat : compose
+
+Commande "1" -- "1" Paiement : regle
+Commande "1" -- "0..1" Livraison : livre
+
+Produit "1" *-- "1" Stock : surveille
+Fournisseur "1" -- "*" Produit : fournit
+Fournisseur "1" -- "*" CommandeInterne : traite
+CommandeInterne "1" *-- "1..*" LigneCommandeInterne : detail
+LigneCommandeInterne "*" -- "1" Produit : concerne
+
+Personnel <|-- Serveur
+Personnel <|-- Chef
+Personnel <|-- Livreur
+Personnel <|-- Administrateur
+
+Commande "0..1" -- "1" Serveur : prise_par
+Livraison "0..1" -- "1" Livreur : effectuee_par
+
+note right of LigneCommande
+  Une ligne appartient soit ? un panier en cours
+  soit ? une commande confirm?e.
+end note
+
+@enduml
