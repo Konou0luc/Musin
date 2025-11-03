@@ -1,5 +1,5 @@
 @startuml
-title Syst?me de gestion de restaurant - Diagramme de classes
+title Systeme de gestion de restaurant - Diagramme de classes
 
 hide empty methods
 
@@ -167,7 +167,7 @@ Commande "1" *-- "1..*" LigneCommande : contient
 
 LigneCommande "*" -- "1" Plat : reference
 Plat "*" -- "1" CategoriePlat : appartient
-Menu "1" o-- "1..*" Plat : compose
+Menu "0..*" o-- "1..*" Plat : compose
 
 Commande "1" -- "1" Paiement : regle
 Commande "1" -- "0..1" Livraison : livre
@@ -183,12 +183,12 @@ Personnel <|-- Chef
 Personnel <|-- Livreur
 Personnel <|-- Administrateur
 
-Commande "0..1" -- "1" Serveur : prise_par
-Livraison "0..1" -- "1" Livreur : effectuee_par
+Commande "0..1" -- "0..*" Serveur : prise_par
+Livraison "1" -- "0..*" Livreur : effectuee_par
 
 note right of LigneCommande
-  Une ligne appartient soit ? un panier en cours
-  soit ? une commande confirm?e.
+  Une ligne appartient soit a un panier en cours
+  soit a une commande confirmee.
 end note
 
 @enduml
